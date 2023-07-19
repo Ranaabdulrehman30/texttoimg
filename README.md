@@ -73,6 +73,18 @@ The lambda fucntion is then deployed on aws with the name (texttoimg) along with
 
 After following these steps, your SageMaker endpoint will be serving multiple models concurrently. Each model can be invoked separately by specifying the model name or variant name in the inference requests.
 
+## 6. To tweak the parameters of the Hugging Face Stable Diffusion model deployed on an AWS SageMaker endpoint, you'll need to follow these general steps:
+1. Modify the model parameters: Open the model configuration file in a text editor. : Look for a file named "config.json" or similar within the model's directory structure. Look for the relevant sections or variables in the configuration file that correspond to the parameters you want to tweak. Modify the parameter values according to your requirements.
+2. Save the modified model configuration: After making the desired parameter changes, save the modified model configuration file.
+3. Upload the modified model configuration to S3: Use the AWS CLI to upload the modified model configuration file back to the S3 bucket: (aws s3 cp <local_modified_config_file_path> s3://<bucket_name>/<config_file_path>)
+
+   Replace <local_modified_config_file_path> with the local file path of the modified configuration file, <bucket_name> with the name of the S3 bucket, and <config_file_path> with the desired path for the configuration file within the bucket.
+
+4. Update the SageMaker endpoint: Finally, update the SageMaker endpoint to use the modified model configuration. Use the AWS CLI or the SageMaker API to update the endpoint configuration with the new model configuration: (aws sagemaker update-endpoint --endpoint-name <endpoint_name> --endpoint-config-name <endpoint_config_name>)
+
+   Replace <endpoint_name> with the name of your existing SageMaker endpoint, and <endpoint_config_name> with the name of the updated endpoint configuration.
+
+By following these steps, you can tweak the Stable Diffusion model parameters by modifying the model configuration file and updating the SageMaker endpoint to use the modified configuration.
 
 
 

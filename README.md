@@ -46,6 +46,35 @@ Now, lets generate some images. As example lets generate 3 images for the prompt
 After model deployement and it's testing locally. Let integrate the Endpoint name in the Lambda Script, along with the customized script to upload the images in the s3 bucket. The Lambda Fucntion takes as prompt and returns the URL of the images generated. The s3 bucket itself is private so the these URLs are not directly accessible. 
 The lambda fucntion is then deployed on aws with the name (texttoimg) along with the addition of required layers.
 
+## 5. Here are the steps to add more models to an existing endpoint:
+
+1. Create new models: Prepare and train the additional models you want to add to the endpoint. Each model should be saved as a tarball file (model.tar.gz) and uploaded to an S3 bucket.
+
+2. Register the new models: Use the AWS CLI or SageMaker API to register the new models. For each model, provide a unique model name and the S3 location of the model artifacts (model.tar.gz).
+
+   
+   (aws sagemaker create-model --model-name <new_model_name> --primary-container Image<container_image>,ModelDataUrl=s3://<bucket_name>/<model_tarball_location>)
+   
+   Replace <new_model_name> with the desired name for the new model, <container_image> with the appropriate container image for the model, <bucket_name> with the name of the S3 bucket where the model artifacts are stored, and <model_tarball_location> with the location of the model.tar.gz file within the bucket.
+
+   Repeat this step for each additional model you want to add.
+3. Update the endpoint: Once the new models are registered, you can update the endpoint to include them. Use the AWS CLI or the SageMaker API to update the endpoint with the new models.
+
+   (aws sagemaker update-endpoint --endpoint-name <endpoint_name> --desired-capacity <new_desired_capacity> --production-variants "[{ModelName=<existing_model_name>,VariantName=<variant_name>,InitialInstanceCount=<instance_count>,InstanceType=<instance_type>},{ModelName=<new_model_name>,VariantName=<variant_name>,InitialInstanceCount=<instance_count>,InstanceType=<instance_type>}]")
+
+   Replace <endpoint_name> with the name of your existing endpoint, <new_desired_capacity> with the desired number of instances for the updated endpoint, <existing_model_name> with the name of the model already associated with the endpoint, <variant_name> with the name for the variant (e.g., "variant1"), <instance_count> with the desired number of instances for each model, and <instance_type> with the desired instance type.
+
+   Repeat the {ModelName=...,VariantName=...,InitialInstanceCount=...,InstanceType=...} section for each model you want to add, specifying the 
+    corresponding details.
+4. Wait for the endpoint update: The endpoint update process may take some time. You can monitor the status of the endpoint using the AWS Management Console or the AWS CLI:
+    (aws sagemaker describe-endpoint --endpoint-name <endpoint_name> --query "EndpointStatus")
+
+   Wait until the endpoint status changes to "InService" before proceeding.
+
+After following these steps, your SageMaker endpoint will be serving multiple models concurrently. Each model can be invoked separately by specifying the model name or variant name in the inference requests.
+
+
+
 
 
 
